@@ -27,8 +27,10 @@ public class Producer {
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
         //send data
+        String topic = "first-topic";
+        String key = "test_key";
         String msg = "SDK : " + new Random().nextInt();
-        ProducerRecord<String, String> record = new ProducerRecord<>("first-topic", msg);
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, msg);
         producer.send(record, (RecordMetadata recordMetadata, Exception e) -> {
                     if (null == e) {
                         System.out.println("Partition : " + recordMetadata.partition());
