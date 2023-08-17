@@ -1,6 +1,6 @@
 package com.learning.kafka;
 
-import org.apache.kafka.clients.producer.Callback;
+import com.learning.kafka.customuserdata.User;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -21,16 +21,17 @@ public class Producer {
         Properties properties = new Properties();
         properties.put("bootstrap.servers", "localhost:9092");
         properties.put("key.serializer", StringSerializer.class.getName());
-        properties.put("value.serializer", StringSerializer.class.getName());
+        properties.put("value.serializer", "com.learning.kafka.customuserdata.UserSerializer");
 
         // create producer
-        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+        KafkaProducer<String, User> producer = new KafkaProducer<>(properties);
 
         //send data
         String topic = "first-topic";
         String key = "test_key";
-        String msg = "SDK : " + new Random().nextInt();
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, msg);
+        User msg = new User();
+
+        ProducerRecord<String, User> record = new ProducerRecord<>(topic, key, msg);
         producer.send(record, (RecordMetadata recordMetadata, Exception e) -> {
                     if (null == e) {
                         System.out.println("Partition : " + recordMetadata.partition());
