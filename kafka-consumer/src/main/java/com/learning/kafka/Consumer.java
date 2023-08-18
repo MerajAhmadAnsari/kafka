@@ -1,6 +1,6 @@
 package com.learning.kafka;
 
-import jdk.jshell.spi.ExecutionControlProvider;
+import com.learning.kafka.customuserdata.User;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -20,12 +20,12 @@ public class Consumer {
         Properties properties = new Properties();
         properties.put("bootstrap.servers", "localhost:9092");
         properties.put("key.deserializer", StringDeserializer.class.getName());
-        properties.put("value.deserializer", StringDeserializer.class.getName());
+        properties.put("value.deserializer", "com.learning.kafka.customuserdata.UserDeSerializer");
         properties.put("group.id", "my-test-group");
         properties.put("auto.offset.reset", "earliest");
 
         //Create Consumer
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+        KafkaConsumer<String, User> consumer = new KafkaConsumer<>(properties);
 
         // handle graceful exit
         final Thread mainThread = Thread.currentThread();
@@ -43,25 +43,23 @@ public class Consumer {
         consumer.subscribe(Arrays.asList("first-topic"));
 
         //Poll for data
-        try{
+        try {
             while (true) {
                 System.out.println("Waiting for new messages...");
 
-                ConsumerRecords<String, String> records = consumer.poll(1000);
-                for (ConsumerRecord<String, String> singleRecord : records) {
+                ConsumerRecords<String, User> records = consumer.poll(1000);
+                for (ConsumerRecord<String, User> singleRecord : records) {
                     System.out.println("Key : " + singleRecord.key());
                     System.out.println("Value : " + singleRecord.value());
                     System.out.println("Offset : " + singleRecord.offset());
                     System.out.println("Partition : " + singleRecord.partition());
                 }
             }
-        }catch(WakeupException e){
+        } catch (WakeupException e) {
             System.out.println("Consumer is going to shutdown");
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Generic error : " + e.getMessage());
-        }
-        finally {
+        } finally {
             consumer.close();
         }
 
